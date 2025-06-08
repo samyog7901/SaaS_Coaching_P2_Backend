@@ -21,7 +21,7 @@ sequelize.authenticate()
 })
 
 //DB migration/ pushing
-sequelize.sync({force:false})
+sequelize.sync({alter:false})
 .then(()=>{
     console.log('Database synced!')
 })

@@ -22,7 +22,8 @@ class User extends Model{
     declare username:string
     @Column({
         type:DataType.STRING,
-        allowNull:false
+        allowNull:false,
+        unique:true
     })
     declare email:string
 
