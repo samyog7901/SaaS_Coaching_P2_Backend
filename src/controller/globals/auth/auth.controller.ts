@@ -1,6 +1,7 @@
 import {Request,Response} from "express"
 import User from "../../../database/models/user.model"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 class AuthController{
 
@@ -25,7 +26,45 @@ class AuthController{
             message:"User registered successfully"
         })
     }
-    async loginUser(){}
+    static async loginUser(req:Request,res:Response):Promise<void>{
+        const {email,password} = req.body
+        if(!email || !password){
+            res.status(400).json({
+                message:"Please provide email, password!"
+            })
+            return
+        }
+        const data = await User.findAll({
+            where:{
+                email
+            }
+        })
+        if(data.length == 0){
+            res.status(400).json({
+                message:"User not found!"
+            })
+            
+        }else{
+            const isPasswordMatch = bcrypt.compareSync(password,data[0].password)
+            if(isPasswordMatch){
+                const token = jwt.sign({id: data[0].id},process.env.SECRET_KEY as string,
+                    {
+                        expiresIn:"90d"
+                    }
+                )
+                res.status(200).json({
+                    message:"User logged in successfully!",
+                    token
+                })
+                console.log(token)
+            }else{
+                res.status(403).json({
+                    message:"Invalid email or password!"
+                })
+            }
+        }
+    }
+      
 }
 
 export default AuthController
