@@ -25,7 +25,9 @@ class Middleware{
                 })
                 return
             }else{
-                const  userData = await User.findByPk(decoded.id)
+                const  userData = await User.findByPk(decoded.id,{
+                    attributes: ['id', 'username', 'email', 'role', 'currentInstituteNumber']
+                })
                 if(!userData){
                     res.status(403).json({
                         message : "No user with that id"

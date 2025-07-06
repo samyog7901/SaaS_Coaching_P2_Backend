@@ -7,8 +7,9 @@ export interface AuthRequest extends Request{
         username : string,
         id : string,
         email : string | null,
-        role : string
-    },
-    instituteNumber ?: number | string
+        role : string,
+        currentInstituteNumber ?: number | string | null
+    }
+    
 
 }
