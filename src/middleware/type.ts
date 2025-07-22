@@ -9,7 +9,8 @@ export interface AuthRequest extends Request{
         email : string | null,
         role : string,
         currentInstituteNumber ?: number | string | null
-    }
+    },
+    file?: Express.Multer.File
     
 
 }

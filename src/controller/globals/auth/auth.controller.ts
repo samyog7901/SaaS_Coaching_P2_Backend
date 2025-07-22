@@ -2,6 +2,7 @@ import {Request,Response} from "express"
 import User from "../../../database/models/user.model"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import generateJwtToken from "../../../services/generateJwtToken"
 
 class AuthController{
 
@@ -47,11 +48,7 @@ class AuthController{
         }else{
             const isPasswordMatch = bcrypt.compareSync(password,data[0].password)
             if(isPasswordMatch){
-                const token = jwt.sign({id: data[0].id},process.env.SECRET_KEY as string,
-                    {
-                        expiresIn:"90d"
-                    }
-                )
+                const token = generateJwtToken({id:data[0].id})
                 res.status(200).json({
                     message:"User logged in successfully!",
                     token
