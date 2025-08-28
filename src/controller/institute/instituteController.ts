@@ -16,7 +16,7 @@ class InstituteController{
         const {instituteName,instituteEmail,institutePhoneNumber,
         instituteAddress} = req.body
         const instituteVatNo = req.body.instituteVatNo || null
-        const institutePanNo = req.body.instituePanNo || null
+        const institutePanNo = req.body.institutePanNo || null
         if(!instituteName || !instituteEmail || !institutePhoneNumber || !instituteAddress){
             res.status(400).json({
                 message:"Please fill all the fields"
@@ -26,7 +26,9 @@ class InstituteController{
        
             
         const instituteNumber = generateRandomInstNumber()
-         await sequelize.query(`CREATE TABLE IF NOT EXISTS institute_${institutePanNo || instituteVatNo || instituteNumber}(
+       
+
+         await sequelize.query(`CREATE TABLE IF NOT EXISTS institute_${instituteNumber}(
             id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
             instituteName VARCHAR(255) NOT NULL,
             instituteEmail VARCHAR(255) NOT NULL UNIQUE,
@@ -50,14 +52,15 @@ class InstituteController{
             instituteNumber INT UNIQUE   
         )`)
 
-        await sequelize.query(`INSERT INTO user_institute(userId,instituteNumber) VALUES (?,?)`,{
-            replacements: [req.user?.id, instituteNumber]
-        })
+    
 
         if(req.user){
+            await sequelize.query(`INSERT INTO user_institute(userId,instituteNumber) VALUES (?,?)`,{
+                replacements: [req.user?.id, instituteNumber]
+            })
             await User.update({
                 currentInstituteNumber: instituteNumber,
-                role: 'institute'
+                role: "institute"
             },{
                 where : {
                     id : req.user.id
@@ -128,7 +131,7 @@ class InstituteController{
         )`)
         
 
-        res.status(200).json({
+        res.status(201).json({
             message : "Institute created successfully",
             instituteNumber
         })

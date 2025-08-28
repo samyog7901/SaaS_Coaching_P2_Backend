@@ -6,7 +6,10 @@ const generateJwtToken = (data: {
     instituteNumber ?: string
 })=>{
     //@ts-ignore
-    const token = jwt.sign({data},process.env.JWT_SECRET!,{
+    const token = jwt.sign({
+        id: data.id,
+        instituteNumber: data.instituteNumber
+    },process.env.JWT_SECRET!,{
         expiresIn: process.env.JWT_EXPIRATION 
     })
     return token

@@ -9,19 +9,20 @@ class Middleware{
     async isLoggedIn(req:AuthRequest,res:Response,next:NextFunction):Promise<void>{
         // check if logged in or not
         // accept token(req.headers-->secure)
-        const token = req.headers.authorization
-        if(!token || token === undefined){
+        const authHeader = req.headers.authorization
+        if(!authHeader || !authHeader.startsWith('Bearer ')){
             res.status(401).json({
-                message : "Unauthorized"
+                message : "Unauthorized - No Valid token provided"
 
             })
             return
         }
         // verify token
-        jwt.verify(token,process.env.SECRET_KEY as string,async(err,decoded:any)=>{
+        const token = authHeader.split(' ')[1]
+        jwt.verify(token,process.env.JWT_SECRET!,async(err,decoded:any)=>{
             if(err){
                 res.status(403).json({
-                    message : "Forbidden"
+                    message : "INVALID TOKEN"
                 })
                 return
             }else{

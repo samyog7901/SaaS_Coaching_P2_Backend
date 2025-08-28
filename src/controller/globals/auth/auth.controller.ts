@@ -51,9 +51,13 @@ class AuthController{
                 const token = generateJwtToken({id:data[0].id})
                 res.status(200).json({
                     message:"User logged in successfully!",
-                    token
+                    data : {
+                        token,
+                        username:data[0].username
+
+                    }
                 })
-                console.log(token)
+                
             }else{
                 res.status(403).json({
                     message:"Invalid email or password!"
