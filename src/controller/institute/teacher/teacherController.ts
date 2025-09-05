@@ -11,16 +11,16 @@ class TeacherController{
     static async createTeacher (req: AuthRequest,res:Response){
         // teacher ko kk data chaiyeko xa tyo accept garam
         const instituteNumber = req.user?.currentInstituteNumber
-        const {teacherName, teacherEmail, teacherAddress, teacherPhoneNumber,teacherExpertise, teacherSalary, teacherJoinedDate,courseId} = req.body
+        const {teacherName, teacherEmail, teacherPhoneNumber,teacherExperience, teacherSalary, teacherJoinedDate,courseId} = req.body
         const teacherPhoto = req.file ? req.file.path : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxR6Owe3AOpaleqNTELMgJKg9MNySuuHjQ_Q&s"
-        if(!teacherName || !teacherEmail || !teacherAddress || !teacherPhoneNumber || !teacherExpertise || !teacherSalary || !teacherJoinedDate){
+        if(!teacherName || !teacherEmail  || !teacherPhoneNumber || !teacherExperience || !teacherSalary || !teacherJoinedDate || !courseId){
             return res.status(400).json({ message: "All fields are required" })
         }
         // password generate function
         const data = GenerateRandomPassword.generateRandomPassword(teacherName)
-        await sequelize.query(`INSERT INTO teacher_${instituteNumber}(teacherName, teacherEmail, teacherAddress, teacherPhoneNumber, teacherExpertise, teacherSalary, teacherJoinedDate, teacherPhoto, teacherPassword) VALUES (?,?,?,?,?,?,?,?,?)`, {
+        await sequelize.query(`INSERT INTO teacher_${instituteNumber}(teacherName, teacherEmail, teacherPhoneNumber,teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, teacherPassword) VALUES (?,?,?,?,?,?,?,?)`, {
             type : QueryTypes.INSERT,
-            replacements : [teacherName, teacherEmail, teacherAddress, teacherPhoneNumber, teacherExpertise, teacherSalary, teacherJoinedDate, teacherPhoto, (await data).hashedVersion]
+            replacements : [teacherName, teacherEmail, teacherPhoneNumber, teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, (await data).hashedVersion]
         })
 
         const teacherData : {id:string}[] = await sequelize.query(`SELECT id FROM teacher_${instituteNumber} WHERE teacherEmail = ?`, {
@@ -35,18 +35,20 @@ class TeacherController{
             })
 
         // send mail function goes here
-        const mailInformation ={
+        const mailInformation = {
             to : teacherEmail,
             subject : "Welcome to our Institute",
             text : `Your account has been created successfully. Your username : ${teacherName} , your
             password : ${(await data).plainVersion} and your institute Number : ${instituteNumber}.`
 
         }
-        await sendMail(mailInformation)
-
-
-
-        res.status(200).json({
+        try {
+            await sendMail(mailInformation)
+            console.log("✅ Mail sent to:", teacherEmail)
+          } catch (mailError) {
+            console.error("❌ Failed to send mail:", mailError)
+          }
+          res.status(201).json({
             message : "Teacher created successfully"
         })
     }

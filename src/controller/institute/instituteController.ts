@@ -83,10 +83,9 @@ class InstituteController{
         await sequelize.query(`CREATE TABLE IF NOT EXISTS teacher_${instituteNumber}(
            id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
             teacherName VARCHAR(255) NOT NULL,
-            teacherEmail VARCHAR(255) NOT NULL UNIQUE,
+            teacherEmail VARCHAR(255) NOT NULL,
             teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE ,
-            teacherAddress VARCHAR(255) NOT NULL,
-            teacherExpertise VARCHAR(255),
+            teacherExperience VARCHAR(255),
             teacherJoinedDate DATE,
             teacherSalary VARCHAR(100),
             teacherPhoto VARCHAR(255),

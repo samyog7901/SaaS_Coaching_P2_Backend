@@ -8,26 +8,31 @@ import { QueryTypes } from "sequelize";
 
 
 class CourseController{
-    static async createCourse (req: AuthRequest, res: Response){
-
+    static async createCourse(req: AuthRequest, res: Response) {
         const instituteNumber = req.user?.currentInstituteNumber
-        const { courseName, courseDescription, courseDuration, coursePrice,courseLevel, categoryId} = req.body
+        const { courseName, courseDescription, courseDuration, coursePrice, courseLevel, categoryId } = req.body
         
-        if(!courseName || !courseDescription || !courseDuration || !coursePrice || !courseLevel || !categoryId){ 
+        if (!courseName || !courseDescription || !courseDuration || !coursePrice || !courseLevel || !categoryId) {
             return res.status(400).json({ message: "All fields are required" })
         }
-        const courseThumbnail = req.file ? req.file?.path : null
+    
+        const courseThumbnail = req.file ? req.file.path : null
         console.log("file from multer:", req.file);
+    
 
-        const returnedData = await sequelize.query(`INSERT INTO course_${instituteNumber}(courseName,courseDescription,courseDuration,coursePrice,courseLevel,courseThumbnail,categoryId) VALUES (?,?,?,?,?,?,?)`, {
-            replacements: [courseName, courseDescription, courseDuration, coursePrice, courseLevel,courseThumbnail,categoryId]
-        })
-        console.log(returnedData)
-        res.status(200).json({
-            message : "Course created successfully"
-           
+        await sequelize.query(
+            `INSERT INTO course_${instituteNumber}(courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail, categoryId) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)
+            `,{
+                replacements: [courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail, categoryId],
+                type:QueryTypes.INSERT
+            })
+    
+        res.status(201).json({
+            message: "Course created successfully"
         })
     }
+    
 
     static async deleteCourse (req: AuthRequest, res: Response) {
         const instituteNumber = req.user?.currentInstituteNumber

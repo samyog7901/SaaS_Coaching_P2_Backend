@@ -8,7 +8,7 @@ interface IMailInformation{
     text: string
 }
 
-const sendMail =async (mailInformation:IMailInformation)=>{
+const sendMail = async (mailInformation:IMailInformation)=>{
     // mail pathaune logic goes here
     // 1. create nodemailer transport(configuration)
 
@@ -29,9 +29,13 @@ const sendMail =async (mailInformation:IMailInformation)=>{
     }
 
     try{
-        await transporter.sendMail(mailFormatObject)
+        const info = await transporter.sendMail(mailFormatObject)
+        console.log("✅ Mail sent:", info.response)
+        return true
     }catch(error){
         console.log(error)
+        throw new Error("Mail not sent")
+        return false
     }
 }
 
