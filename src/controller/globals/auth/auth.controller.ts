@@ -48,7 +48,9 @@ class AuthController{
         }else{
             const isPasswordMatch = bcrypt.compareSync(password,data[0].password)
             if(isPasswordMatch){
-                const token = generateJwtToken({id:data[0].id})
+                const token = generateJwtToken({id:data[0].id,instituteNumber: data[0].currentInstituteNumber})
+                console.log("Generated JWT:", token);
+                console.log("Payload:", jwt.decode(token));
                 res.status(200).json({
                     message:"User logged in successfully!",
                     data : {

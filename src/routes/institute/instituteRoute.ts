@@ -15,9 +15,11 @@ const upload = multer({storage:storage})
 const router:Router = express.Router()
 
 // upload.single('institutePhoto'),
-router.route("/").post(middleware.isLoggedIn,asyncErrorHandler(InstituteController.createInstitute),
-    InstituteController.createTeacherTable,InstituteController.createStudentTable,InstituteController.createCategoryTable,
+router.route("/")
+.post(middleware.isLoggedIn,asyncErrorHandler(InstituteController.createInstitute),
+    InstituteController.createTeacherTable,InstituteController.createStudentTable,InstituteController.createCategoryTable,InstituteController.createCourseChapterTable,InstituteController.createChapterLessonTable,
     asyncErrorHandler(InstituteController.createCourseTable))
+.get(middleware.isLoggedIn,asyncErrorHandler(InstituteController.getInstitute))    
 
 
 export default router

@@ -10,7 +10,7 @@ import sendMail from "../../../services/sendEmail";
 class TeacherController{
     static async createTeacher (req: AuthRequest,res:Response){
         // teacher ko kk data chaiyeko xa tyo accept garam
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const {teacherName, teacherEmail, teacherPhoneNumber,teacherExperience, teacherSalary, teacherJoinedDate,courseId} = req.body
         const teacherPhoto = req.file ? req.file.path : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxR6Owe3AOpaleqNTELMgJKg9MNySuuHjQ_Q&s"
         if(!teacherName || !teacherEmail  || !teacherPhoneNumber || !teacherExperience || !teacherSalary || !teacherJoinedDate || !courseId){
@@ -18,9 +18,9 @@ class TeacherController{
         }
         // password generate function
         const data = GenerateRandomPassword.generateRandomPassword(teacherName)
-        await sequelize.query(`INSERT INTO teacher_${instituteNumber}(teacherName, teacherEmail, teacherPhoneNumber,teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, teacherPassword) VALUES (?,?,?,?,?,?,?,?)`, {
+        await sequelize.query(`INSERT INTO teacher_${instituteNumber}(teacherName, teacherEmail, teacherPhoneNumber,teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, teacherPassword,courseId) VALUES (?,?,?,?,?,?,?,?,?)`, {
             type : QueryTypes.INSERT,
-            replacements : [teacherName, teacherEmail, teacherPhoneNumber, teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, (await data).hashedVersion]
+            replacements : [teacherName, teacherEmail, teacherPhoneNumber, teacherExperience, teacherSalary, teacherJoinedDate, teacherPhoto, (await data).hashedVersion,courseId]
         })
 
         const teacherData : {id:string}[] = await sequelize.query(`SELECT id FROM teacher_${instituteNumber} WHERE teacherEmail = ?`, {
@@ -44,7 +44,7 @@ class TeacherController{
         }
         try {
             await sendMail(mailInformation)
-            console.log("✅ Mail sent to:", teacherEmail)
+            // console.log("✅ Mail sent to:", teacherEmail)
           } catch (mailError) {
             console.error("❌ Failed to send mail:", mailError)
           }
@@ -53,8 +53,11 @@ class TeacherController{
         })
     }
     static async getTeachers (req: AuthRequest, res: Response){
-        const instituteNumber = req.user?.currentInstituteNumber
-        const teachers = await sequelize.query(`SELECT * FROM teacher_${instituteNumber}`, {
+        const instituteNumber = req.user!.currentInstituteNumber
+        const teachers = await sequelize.query(`SELECT t.*, c.courseName
+             FROM teacher_${instituteNumber} AS t
+             JOIN course_${instituteNumber} AS c
+             ON t.courseId = c.id`, {
             type : QueryTypes.SELECT
         })
         res.status(200).json({
@@ -63,7 +66,7 @@ class TeacherController{
         })
     }
     static async deleteTeacher (req: AuthRequest, res: Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const id = req.params.id
         await sequelize.query(`DELETE FROM teacher_${instituteNumber} WHERE id = ?`, {
             type : QueryTypes.DELETE,

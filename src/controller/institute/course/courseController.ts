@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { Response } from "express"
 import sequelize from "../../../database/connection"
 import { AuthRequest } from "../../../middleware/type";
 import { QueryTypes } from "sequelize";
@@ -8,9 +8,9 @@ import { QueryTypes } from "sequelize";
 
 
 class CourseController{
-    static async createCourse(req: AuthRequest, res: Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
-        const { courseName, courseDescription, courseDuration, coursePrice, courseLevel, categoryId } = req.body
+    static async createCourse(req: AuthRequest, res: Response){
+        const instituteNumber = req.user!.currentInstituteNumber
+        const { courseName, courseDescription, courseDuration, coursePrice, courseLevel, categoryId, teacherId } = req.body
         
         if (!courseName || !courseDescription || !courseDuration || !coursePrice || !courseLevel || !categoryId) {
             return res.status(400).json({ message: "All fields are required" })
@@ -35,8 +35,11 @@ class CourseController{
     
 
     static async deleteCourse (req: AuthRequest, res: Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const courseId = req.params.id
+        if(!courseId){
+            return res.status(400).json({message:"course id is required"})
+        }
         const [courseData] = await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id = ?`, {
             replacements: [courseId]
         })
@@ -49,19 +52,29 @@ class CourseController{
         return res.status(200).json({ message: "Course deleted successfully" });
     }
 
-    static async getAllCourse(req:AuthRequest,res:Response){
-        const instituteNumber = req.user?.currentInstituteNumber
-        const courses = await sequelize.query(`SELECT * FROM course_${instituteNumber} JOIN category_${instituteNumber} ON course_${instituteNumber}.categoryId = category_${instituteNumber}.id`,{
-            type : QueryTypes.SELECT
-        })
+    static async getAllCourse(req: AuthRequest, res: Response) {
+        const instituteNumber = req.user!.currentInstituteNumber;
+    
+        const courses = await sequelize.query(
+            `SELECT c.*, cat.categoryName 
+             FROM course_${instituteNumber} AS c
+             LEFT JOIN category_${instituteNumber} AS cat
+             ON c.categoryId = cat.id
+             `,
+            {
+                type: QueryTypes.SELECT
+            }
+        );
+    
         return res.status(200).json({
             message: "Courses fetched successfully",
-            data : courses 
-        })
+            data: courses
+        });
     }
+    
 
     static async getSingleCourse (req:AuthRequest,res:Response){
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const courseId = req.params.id
         const course = await sequelize.query(`SELECT * FROM course_${instituteNumber} WHERE id = ?`, {
             replacements: [courseId]

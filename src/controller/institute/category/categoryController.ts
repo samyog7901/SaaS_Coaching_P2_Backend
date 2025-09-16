@@ -7,7 +7,7 @@ import { QueryTypes } from "sequelize"
 
 class CategoryController{
     static async createCategory(req:AuthRequest, res:Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const { categoryName, categoryDescription } = req.body
 
         if (!categoryName || !categoryDescription) {
@@ -35,7 +35,7 @@ class CategoryController{
         
     }
     static async getCategories(req:AuthRequest, res:Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const categories = await sequelize.query(`SELECT * FROM category_${instituteNumber}`,
             {
                 type : QueryTypes.SELECT,
@@ -52,7 +52,7 @@ class CategoryController{
         })
     }
     static async deleteCategory(req:AuthRequest, res:Response) {
-        const instituteNumber = req.user?.currentInstituteNumber
+        const instituteNumber = req.user!.currentInstituteNumber
         const id =    req.params.id
         if (!id) {
             return res.status(400).json({ message: "Category ID is required" })

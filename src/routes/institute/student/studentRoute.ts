@@ -3,6 +3,8 @@
 import express,{ Router } from "express"
 import asyncErrorHandler from "../../../services/asyncErrorHandler"
 import StudentController from "../../../controller/institute/student/studentController"
+import middleware from "../../../middleware/middleware"
+import upload from "../../../middleware/multerUpload"
 
 
 
@@ -10,7 +12,11 @@ import StudentController from "../../../controller/institute/student/studentCont
 const router:Router = express.Router()
 
 router.route("/")
-.get(asyncErrorHandler(StudentController.getStudents))
+.post(middleware.isLoggedIn,upload.single('studentImage'),asyncErrorHandler(StudentController.createStudent))
+.get(middleware.isLoggedIn,asyncErrorHandler(StudentController.getStudents))
+
+router.route("/:id")
+.delete(middleware.isLoggedIn, asyncErrorHandler(StudentController.deleteStudent))
 
 
 export default router

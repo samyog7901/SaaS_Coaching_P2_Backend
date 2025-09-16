@@ -8,6 +8,9 @@ import studentRoute from "../src/routes/institute/student/studentRoute";
 import categoryRoute from "./routes/institute/category/categoryRoute";
 import teacherInstituteRoute from "./routes/institute/teacher/teacherRoute";
 import teacherRoute from "./routes/teacher/teacherRoute";
+import courseChapterRoute from "./routes/teacher/course/chapters/course-chapter-route"
+import chapterLessonRoute from "./routes/teacher/course/chapters/lessons/chapter-lesson-route"
+import studentInstituteRoute from "./routes/student/institute/student-institute-route"
 
 const app = express();
 
@@ -33,5 +36,10 @@ app.use("/api/institute/category", categoryRoute);
 
 // Teacher Routes
 app.use("/api/teacher", teacherRoute);
+app.use("/api/teacher/course", courseChapterRoute)
+app.use("/api/teacher/course", chapterLessonRoute)
+
+// Student Routes
+app.use("/api/student",studentInstituteRoute)
 
 export default app;

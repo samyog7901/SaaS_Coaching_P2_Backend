@@ -1,5 +1,6 @@
 
 import {Table,Column,Model,DataType} from 'sequelize-typescript'
+import { UserRole } from '../../middleware/type'
 
 @Table({
     tableName:'users', // gui ma dekhauney name
@@ -38,7 +39,7 @@ class User extends Model{
         defaultValue :'student',
         allowNull:false
     })
-    declare role:string
+    declare role:UserRole
 
     @Column({
         type:DataType.STRING

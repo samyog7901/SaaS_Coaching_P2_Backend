@@ -39,9 +39,13 @@ class TeacherController{
         }else{
             //token generation
             const token = generateJwtToken({id: teacherData[0].id, instituteNumber : teacherInstituteNumber})
-            res.status(200).json({
+            res.status(201).json({
                 message: "Teacher logged in successfully",
-                token
+                data : {
+                    teacherToken : token,
+                    teacherInstituteNumber,
+                    teacherEmail
+                }
             })
         }
     }
